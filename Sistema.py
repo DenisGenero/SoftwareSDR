@@ -2,28 +2,8 @@ import serial
 import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
-import funciones_fft
+import Funciones
 from time import time
-
-# Función para promediar datos en tiempo real #
-def promedio(signal, ventana):
-    if ventana<len(signal):
-        acum=np.average(signal[len(signal)-1-ventana:len(signal)-1])
-    else:
-        acum=np.average(signal)
-    return acum
-
-# Función para filtrar en tiempo real
-def filtrar(b, a, signal, filreredSignal, i):
-    acum=0
-    if(len(signal)>=len(b)):
-        for j in range(0,len(b),1):
-            acum+=b[j]*signal[i-j]
-        for j in range(1,len(a),1):
-            acum+=a[j]*filreredSignal[i-j]
-    else:
-        acum = signal[i]
-    return acum
 
 # Configuración del puerto serie
 serial.PARITY_NONE
@@ -81,9 +61,10 @@ while dato != s:
 
 # Segundo que dura el estudio
 segundos = 15
+frec_muestreo = 100; # En Hz
 
 # Algoritmo de adquisición y procesamiento
-while i < segundos*100:
+while i < segundos*frec_muestreo:
     dato = int.from_bytes(ser.read(1),"little")
     if dato == s:
         t_start = time()
@@ -102,9 +83,9 @@ while i < segundos*100:
             senial.append(valor)
             valor = 0
             # Filtrado pasa bajos
-            filtrada.append(filtrar(b, a, senial, filtrada, i))
-            # Promediación con una ventana de 20 muiestras
-            promediada.append(promedio(filtrada, 20))
+            filtrada.append(Funciones.RealTimefilter(b, a, senial, filtrada, i))
+            # Promediación con una ventana de 20 muestras
+            promediada.append(Funciones.RealTimeAverage(filtrada, 20))
             if(i>1):
                 # Detección de proceso: inspiración o espiración
                 pend_anterior = promediada[i-1]-promediada[i-2]

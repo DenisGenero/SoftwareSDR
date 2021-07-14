@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Librerías
 import numpy as np
 from scipy import fft
 
@@ -59,4 +56,39 @@ def fft_pot(x, fs):
     pot = senial_fft_mod ** 2
     
     return f, pot
+
+# Función para promediar datos en tiempo real #
+def RealTimeAverage(signal, ventana):
+    """
+        ------------------------
+        INPUT:
+        --------
+        signal: array de una dimensión conteniendo la señal que se quiere filtrar
+        ventana: cantidad de muestras de la señal para hacer el filtrado en tiempo
+        real. Valores recomendados: entre 10 a 30 muestras.
+        ------------------------
+        OUTPUT:
+        --------
+        f: array de una dimension con con los valores correspondientes al eje de
+        frecuencias de la fft.
+        pot: array de una dimensión conteniendo los valores en potencia de la fft
+        de la señal.
+        """
+    if ventana<len(signal):
+        acum=np.average(signal[len(signal)-1-ventana:len(signal)-1])
+    else:
+        acum=np.average(signal)
+    return acum
+
+# Función para filtrar en tiempo real
+def RealTimefilter(b, a, signal, filreredSignal, i):
+    acum=0
+    if(len(signal)>=len(b)):
+        for j in range(0,len(b),1):
+            acum+=b[j]*signal[i-j]
+        for j in range(1,len(a),1):
+            acum+=a[j]*filreredSignal[i-j]
+    else:
+        acum = signal[i]
+    return acum
 

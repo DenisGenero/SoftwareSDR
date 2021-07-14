@@ -5,7 +5,7 @@ import numpy as np
 import funciones_fft
 from time import time
 
-# Función para promediar datos en tiempo real
+# Función para promediar datos en tiempo real #
 def promedio(signal, ventana):
     if ventana<len(signal):
         acum=np.average(signal[len(signal)-1-ventana:len(signal)-1])
